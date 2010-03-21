@@ -20,6 +20,36 @@ var selectedForm = new Object();
  * </code>
  */
 var FormToXMLExporter = {
+	
+	init : function() {
+		fox.createFoxToolbar();
+	},
+	
+	createFoxToolbar : function() {
+		var foxRoot = jQuery('#' + fox.foxConstants.EXPORTER_ROOT_ID);
+		var toolbar = fox.elementProvider(fox.foxComponent.TOOLBAR);
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_FIND_FORMS));
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_HIDE_PANEL));
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_REFRESH));
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_SHOW_INFO));
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_PICK_FIELDS));
+		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_GET_ACTIONSET));
+		jQuery(foxRoot).append(toolbar);
+		var pickTable = fox.elementProvider(fox.foxComponent.PICK_TABLE);
+		var pickTableHeader = jQuery('<tr/>');
+		jQuery(pickTableHeader).append(fox.elementProvider(fox.foxComponent.PICK_TABLE_TH1));
+		jQuery(pickTableHeader).append(fox.elementProvider(fox.foxComponent.PICK_TABLE_TH2));
+		jQuery(pickTable).append(pickTableHeader);
+		jQuery(foxRoot).append(pickTable);
+	},
+	
+	elementProvider : function(comp) {
+		var created = jQuery(comp.tagType).append(comp.txt).addClass(comp.cssClass).attr('id', comp.cid);
+		if (comp.evt != undefined && comp.handler != undefined) {
+			jQuery(created).bind(comp.evt, comp.handler);
+		}
+		return created;
+	},
 
 	pickFields : function() {		
 		var container = document.getElementById('container');
@@ -525,52 +555,52 @@ var FormToXMLExporter = {
 	 */
 	show_tip_text : function(string) {
 		Tip(string, DELAY, 100, WIDTH, 300, BGCOLOR, '#fff');
-	},	
+	},
 
 	tag : {
-		SELECT_MANY : 'select-many',
-		CLICK : 'click',
-		CHECK : 'check',
-		SET : 'set',
-		GET : 'get',
-		DATA_SET : 'action-set',
-		XML_PROLOG : 'xml',
-		DATA : 'data',
-		ENTRY : 'entry',
-		VALUE : 'value',
-		INPUT : 'input',
-		TEXTAREA : 'textarea',
-		SELECT : 'select',
-		DIV : 'div',
-		A : 'a',
-		FORM : 'form',
-		TABLE : 'table',
-		THEAD : 'thead',
-		TBODY : 'tbody',
-		CAPTION : 'caption',
-		TR : 'tr',
-		TD : 'td',
-		TH : 'th'
+		SELECT_MANY	: 'select-many',
+		CLICK 		: 'click',
+		CHECK 		: 'check',
+		SET 		: 'set',
+		GET 		: 'get',
+		DATA_SET 	: 'action-set',
+		XML_PROLOG 	: 'xml',
+		DATA 		: 'data',
+		ENTRY 		: 'entry',
+		VALUE 		: 'value',
+		INPUT 		: 'input',
+		TEXTAREA 	: 'textarea',
+		SELECT 		: 'select',
+		DIV 		: 'div',
+		A 			: 'a',
+		FORM 		: 'form',
+		TABLE 		: 'table',
+		THEAD 		: 'thead',
+		TBODY 		: 'tbody',
+		CAPTION 	: 'caption',
+		TR 			: 'tr',
+		TD 			: 'td',
+		TH 			: 'th'
 	},
 
 	attribute : {
-		ATTRIBUTE : 'attribute',
-		LOCATOR : 'locator',
-		ID : 'id',
-		READONLY : 'readonly',
-		TYPE : 'type',
-		HREF : 'href',
-		MULTIPLE : 'multiple'
+		ATTRIBUTE 	: 'attribute',
+		LOCATOR 	: 'locator',
+		ID 			: 'id',
+		READONLY 	: 'readonly',
+		TYPE 		: 'type',
+		HREF 		: 'href',
+		MULTIPLE 	: 'multiple'
 	},
 
 	type : {
-		HIDDEN : 'hidden',
-		BUTTON : 'button',
-		SUBMIT : 'submit',
-		CHECKBOX : 'checkbox',
-		RADIO : 'radio',
-		TEXT : 'text',
-		PASSWORD : 'password'
+		HIDDEN 		: 'hidden',
+		BUTTON 		: 'button',
+		SUBMIT 		: 'submit',
+		CHECKBOX 	: 'checkbox',
+		RADIO 		: 'radio',
+		TEXT 		: 'text',
+		PASSWORD 	: 'password'
 	},	
 
 	/**
@@ -582,26 +612,39 @@ var FormToXMLExporter = {
 	 * Common constants.
 	 */
 	foxConstants : {
-		BUTTON_REFRESH : 'refresh',
-		CSS_HIDDEN : 'hidden',
-		CSS_FORMS_TABLE : 'frmsTbl',
-		CSS_XML_OUTPUT_WRAPPER : 'outputShow',
-		EXPORTER_ROOT_ID : 'exporter',
-		FORMS_TABLE_ID : 'foundFormsTable',
-		XML_OUTPUT_WRAPPER_ID : 'outField',
-		XML_OUTPUT_FIELD_ID : 'xmlOutput',
-		PICK_TABLE_ID : 'pickTable',
-		TAB : '\t',
-		NEW_LINE : '\n',
-		D_TAB : '\t\t',
-		NAME_PREFIX : 'name=',
-		PREVIEW_CSS_CLASS : ' .preview'
+		BUTTON_REFRESH 			: 'refresh',
+		CSS_HIDDEN 				: 'hidden',
+		CSS_FORMS_TABLE 		: 'frmsTbl',
+		CSS_XML_OUTPUT_WRAPPER 	: 'outputShow',
+		EXPORTER_ROOT_ID 		: 'exporter',
+		FORMS_TABLE_ID 			: 'foundFormsTable',
+		XML_OUTPUT_WRAPPER_ID 	: 'outField',
+		XML_OUTPUT_FIELD_ID 	: 'xmlOutput',
+		PICK_TABLE_ID 			: 'pickTable',
+		TAB 					: '\t',
+		NEW_LINE 				: '\n',
+		D_TAB 					: '\t\t',
+		NAME_PREFIX 			: 'name=',
+		PREVIEW_CSS_CLASS 		: ' .preview'
 	},	
 	
 	jsEvent : {
-		CLICK : 'click',
-		MOUSE_OVER : 'mouseover',
-		MOUSE_OUT : 'mouseout'
+		CLICK 		: 'click',
+		MOUSE_OVER 	: 'mouseover',
+		MOUSE_OUT 	: 'mouseout'
+	},
+	
+	foxComponent : {
+		TOOLBAR 			: { tagType : '<div />', cid : 'options', cssClass : 'options'},
+		OPT_FIND_FORMS 		: { tagType : '<span />', cid : 'findForms', cssClass : 'optLink', txt : 'Find forms', evt : 'click', handler : function(){fox.findFormsInPage();}},
+		OPT_HIDE_PANEL 		: { tagType : '<span />', cid : 'hidePanel', cssClass : 'optLink', txt : 'Hide panel', evt : 'click', handler : function(){fox.hidePanel();}},
+		OPT_REFRESH 		: { tagType : '<span />', cid : 'refresh', cssClass : 'optLink hidden', txt : 'Refresh', evt : 'click', handler : function(){fox.refreshOutput();}},
+		OPT_SHOW_INFO 		: { tagType : '<span />', cid : 'showInfo', cssClass : 'optLink', txt : 'Show info', evt : 'click', handler : function(){fox.getActionSet();}},
+		OPT_PICK_FIELDS 	: { tagType : '<span />', cid : 'pickFields', cssClass : 'optLink', txt : 'Pick fields', evt : 'click', handler : function(){fox.pickFields();}},
+		OPT_GET_ACTIONSET	: { tagType : '<span />', cid : 'getActionSet', cssClass : 'optLink hidden', txt : 'Get actionset', evt : 'click', handler : function(){fox.getActionSet();}},
+		PICK_TABLE			: { tagType : '<table />', cid : 'pickTable', cssClass : 'hidden', txt : ''},
+		PICK_TABLE_TH1		: { tagType : '<th />', cid : '', cssClass : '', txt : 'tagName:locator'},
+		PICK_TABLE_TH2		: { tagType : '<th />', cid : '', cssClass : '', txt : 'remove'}
 	}
 }
 
