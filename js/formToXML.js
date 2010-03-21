@@ -8,7 +8,7 @@ var selectedForm = new Object();
  * A javascript function that provides methods for parsing of html forms and
  * creating a xml with node for every input or textarea element in there. The
  * xml's format is as follows:
- * 
+ *
  * <code>
  * <?xml version="1.0" encoding="UTF-8"?>
  * <action-set>
@@ -19,24 +19,24 @@ var selectedForm = new Object();
  * </action-set>
  * </code>
  */
-var FormToXMLParser = {
+var FormToXMLExporter = {
 
 	pickFields : function() {		
 		var container = document.getElementById('container');
-		JSCommons.AddEventHandler(container, FormToXMLParser.jsEvent.MOUSE_OVER, FormToXMLParser.highlightSource);
-		JSCommons.AddEventHandler(container, FormToXMLParser.jsEvent.MOUSE_OUT, FormToXMLParser.unHighlightSource);
-		JSCommons.AddEventHandler(container, FormToXMLParser.jsEvent.CLICK, FormToXMLParser.pickHandler);
-		var pickTable = document.getElementById(FormToXMLParser.parserConstants.PICK_TABLE_ID);
+		JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
+		JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
+		JSCommons.AddEventHandler(container, fox.jsEvent.CLICK, fox.pickHandler);
+		var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
 		JSCommons.RemoveStyleClass(pickTable, 'hidden');	
 		JSCommons.RemoveStyleClass( document.getElementById('getActionSet'), 'hidden');	
-		JSCommons.AddEventHandler(pickTable, FormToXMLParser.jsEvent.CLICK, FormToXMLParser.removeFromBucket);		
-		FormToXMLParser.pickedList = new Array();
+		JSCommons.AddEventHandler(pickTable, fox.jsEvent.CLICK, fox.removeFromBucket);		
+		fox.pickedList = new Array();
 	},
 	
 	removeFromBucket : function(evt) {
 		var source = JSCommons.SrcElement(evt);	
-		var pickTable = document.getElementById(FormToXMLParser.parserConstants.PICK_TABLE_ID);
-		if (source.tagName.toLowerCase() == FormToXMLParser.tag.INPUT) {
+		var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
+		if (source.tagName.toLowerCase() == fox.tag.INPUT) {
 			var pickTblRow = JSCommons.Parent(JSCommons.Parent(source));
 			pickTable.deleteRow(pickTblRow.rowIndex);
 		}
@@ -45,7 +45,7 @@ var FormToXMLParser = {
 	highlightSource : function(evt) {
 		var source = JSCommons.SrcElement(evt);	
 		JSCommons.AddStyleClass(source, 'highlight');
-		CommonFunctions.show_tip_text(FormToXMLParser.createTooltipContent(source, FormToXMLParser.getLocators(source)));
+		fox.show_tip_text(fox.createTooltipContent(source, fox.getLocators(source)));
 	},
 	
 	unHighlightSource : function(evt) {
@@ -58,7 +58,7 @@ var FormToXMLParser = {
 		var locators = {
 			locatorId : el.id,
 			locatorName : el.name,
-			locatorXpath : FormToXMLParser.getXpath(el)
+			locatorXpath : fox.getXpath(el)
 		};
 		return locators;
 	},
@@ -83,23 +83,23 @@ var FormToXMLParser = {
 		var source = JSCommons.SrcElement(evt);
 		var picked = '<tr><td>';
 		picked += source.tagName + ':';
-		picked += FormToXMLParser.getLocator(source, false);
+		picked += fox.getLocator(source, false);
 		picked += '</td><td><input type="checkbox"></td></tr>';
-		document.getElementById(FormToXMLParser.parserConstants.PICK_TABLE_ID).innerHTML += picked;		
-		FormToXMLParser.pickedList.push(source);
+		document.getElementById(fox.foxConstants.PICK_TABLE_ID).innerHTML += picked;		
+		fox.pickedList.push(source);
 		return false;
 	},	
 	
 	getActionSet : function() {
 		var container = document.getElementById('container');
-		JSCommons.RemoveEventHandler(container, FormToXMLParser.jsEvent.MOUSE_OVER, FormToXMLParser.highlightSource);
-		JSCommons.RemoveEventHandler(container, FormToXMLParser.jsEvent.MOUSE_OUT, FormToXMLParser.unHighlightSource);
-		JSCommons.RemoveEventHandler(container, FormToXMLParser.jsEvent.CLICK, FormToXMLParser.pickHandler);
-		JSCommons.AddStyleClass(document.getElementById(FormToXMLParser.parserConstants.PICK_TABLE_ID), FormToXMLParser.parserConstants.CSS_HIDDEN);
-		FormToXMLParser.PARSER_ROOT_TAG = document
-					.getElementById(this.parserConstants.PARSER_ROOT_ID);
-		FormToXMLParser.showOutputArea();
-		FormToXMLParser.writeXML(FormToXMLParser.pickedList);
+		JSCommons.RemoveEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
+		JSCommons.RemoveEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
+		JSCommons.RemoveEventHandler(container, fox.jsEvent.CLICK, fox.pickHandler);
+		JSCommons.AddStyleClass(document.getElementById(fox.foxConstants.PICK_TABLE_ID), fox.foxConstants.CSS_HIDDEN);
+		fox.EXPORTER_ROOT_TAG = document
+					.getElementById(this.foxConstants.EXPORTER_ROOT_ID);
+		fox.showOutputArea();
+		fox.writeXML(fox.pickedList);
 		return false;
 	},
 	
@@ -107,32 +107,32 @@ var FormToXMLParser = {
 	
 	/**
 	 * Finds all the forms in the current page and shows their ids as links in a
-	 * table. If a link is clicked then the parser is started for that form.
-	 * 
+	 * table. If a link is clicked then the exporter is started for that form.
+	 *
 	 * @return
 	 */
 	findFormsInPage : function() {
 		// get all forms on the page
 		var frms = document.getElementsByTagName(this.tag.FORM);
 		// hide refresh button
-		document.getElementById(this.parserConstants.BUTTON_REFRESH).className = this.parserConstants.HIDDEN;
+		document.getElementById(this.foxConstants.BUTTON_REFRESH).className = this.foxConstants.HIDDEN;
 
 		// create table with forms id's
 		if (frms) {
-			// on the page should be a div tag with id='parser' which
+			// on the page should be a div tag with id='exporter' which
 			// is container for the output data
 			var par = document
-					.getElementById(this.parserConstants.PARSER_ROOT_ID);
-			this.PARSER_ROOT_TAG = document
-					.getElementById(this.parserConstants.PARSER_ROOT_ID);
+					.getElementById(this.foxConstants.EXPORTER_ROOT_ID);
+			this.EXPORTER_ROOT_TAG = document
+					.getElementById(this.foxConstants.EXPORTER_ROOT_ID);
 
 			// remove previous table and textarea if have been used
-			this.removeFieldsIfPressent(this.PARSER_ROOT_TAG);
+			this.removeFieldsIfPressent(this.EXPORTER_ROOT_TAG);
 
 			// create table with found forms ids tag
 			var frmsTable = document.createElement(this.tag.TABLE);
-			frmsTable.className = this.parserConstants.CSS_FORMS_TABLE;
-			frmsTable.id = this.parserConstants.FORMS_TABLE_ID;
+			frmsTable.className = this.foxConstants.CSS_FORMS_TABLE;
+			frmsTable.id = this.foxConstants.FORMS_TABLE_ID;
 			frmsTable.appendChild(this.createCellWithText(this.tag.CAPTION,
 					'Forms found in page:'));
 			var tblHead = document.createElement(this.tag.THEAD);
@@ -148,7 +148,7 @@ var FormToXMLParser = {
 				var cell = document.createElement(this.tag.TD);
 
 				var link = document.createElement(this.tag.A);
-				link.onclick = FormToXMLParser.invokeParser;
+				link.onclick = fox.invokeParser;
 				link.setAttribute(this.attribute.HREF, '#');
 				link.appendChild(document.createTextNode(frms[i].id));
 				cell.appendChild(link);
@@ -159,26 +159,26 @@ var FormToXMLParser = {
 			frmsTable.appendChild(tblBody);
 
 			// append prepared table to the wrapper
-			this.PARSER_ROOT_TAG.appendChild(frmsTable);
+			this.EXPORTER_ROOT_TAG.appendChild(frmsTable);
 		}
 	},
 
 	/**
 	 * Removes forms table and output textarea if they are present.
-	 * 
+	 *
 	 * @param root
 	 *            the wrapper tag
 	 * @return
 	 */
 	removeFieldsIfPressent : function(root) {
 		var frmsTable = document
-				.getElementById(this.parserConstants.FORMS_TABLE_ID);
+				.getElementById(this.foxConstants.FORMS_TABLE_ID);
 		if (frmsTable) {
 			root.removeChild(frmsTable);
 		}
 
 		var outField = document
-				.getElementById(this.parserConstants.XML_OUTPUT_WRAPPER_ID);
+				.getElementById(this.foxConstants.XML_OUTPUT_WRAPPER_ID);
 		if (outField) {
 			root.removeChild(outField);
 		}
@@ -187,7 +187,7 @@ var FormToXMLParser = {
 	/**
 	 * Refreshes the XML output textarea so to catch the last changes in the
 	 * form. No need to reload form.
-	 * 
+	 *
 	 * @return
 	 */
 	refreshOutput : function() {
@@ -196,32 +196,32 @@ var FormToXMLParser = {
 
 	/**
 	 * Creates and shows the XML output textarea.
-	 * 
+	 *
 	 * @return
 	 */
 	showOutputArea : function() {
-		this.removeFieldsIfPressent(this.PARSER_ROOT_TAG);
+		this.removeFieldsIfPressent(this.EXPORTER_ROOT_TAG);
 
 		var txtAreaWrapper = document.createElement(this.tag.DIV);
-		txtAreaWrapper.className = this.parserConstants.CSS_XML_OUTPUT_WRAPPER;
-		txtAreaWrapper.id = this.parserConstants.XML_OUTPUT_WRAPPER_ID;
+		txtAreaWrapper.className = this.foxConstants.CSS_XML_OUTPUT_WRAPPER;
+		txtAreaWrapper.id = this.foxConstants.XML_OUTPUT_WRAPPER_ID;
 
 		txtAreaWrapper.appendChild(this.createCellWithText(this.tag.DIV,
 				'XML output:'));
 		var xmlOutputArea = document.createElement(this.tag.TEXTAREA);
-		xmlOutputArea.id = this.parserConstants.XML_OUTPUT_FIELD_ID;
+		xmlOutputArea.id = this.foxConstants.XML_OUTPUT_FIELD_ID;
 		xmlOutputArea.setAttribute(this.attribute.READONLY, 'true');
 		txtAreaWrapper.appendChild(xmlOutputArea);
 
-		this.PARSER_ROOT_TAG.appendChild(txtAreaWrapper);
+		this.EXPORTER_ROOT_TAG.appendChild(txtAreaWrapper);
 
 		// show refresh button by removing css class hidden
-		document.getElementById(this.parserConstants.BUTTON_REFRESH).className = '';
+		document.getElementById(this.foxConstants.BUTTON_REFRESH).className = '';
 	},
 
 	/**
 	 * Invokes the xmlToForm with html form object to be parsed.
-	 * 
+	 *
 	 * @param e
 	 *            selected from the user form to be parsed
 	 * @return
@@ -234,12 +234,12 @@ var FormToXMLParser = {
 			// to be possible
 			selectedForm = choosenForm;
 		}
-		FormToXMLParser.formToXML(choosenForm);
+		fox.formToXML(choosenForm);
 	},
 
 	/**
 	 * Merges two arrays.
-	 * 
+	 *
 	 * @param array1
 	 *            In this array the elements from the array2 will be added.
 	 * @param array2
@@ -258,10 +258,10 @@ var FormToXMLParser = {
 	 * Check if there is no id set we use the
 	 * name attribute instead or the current element will be
 	 * skipped and logged after the end of the result xml.
-	 
+	
 	 * @param currentElement The element which locator should be found.
 	 * @param shouldLog Shows whether to log this elemet if it does not have id or name attribute.
-	 * @return The id of the element, name or empty string in this order. 
+	 * @return The id of the element, name or empty string in this order.
 	 */
 	getLocator : function(currentElement, shouldLog) {
 		var locator;
@@ -281,18 +281,18 @@ var FormToXMLParser = {
 	/**
 	 * Creates the XML for all found input fields and textareas. Some type of
 	 * fields are skipped: hidden, button, submit
-	 * 
+	 *
 	 * @param e
 	 *            selected from the user form to be parsed
 	 * @return
 	 */
 	formToXML : function(choosenForm) {
-		FormToXMLParser.showOutputArea();
+		fox.showOutputArea();
 		var formElements = choosenForm.elements;
-		var elements = FormToXMLParser.mergeArrays(jQuery('#'
-				+ choosenForm.id + FormToXMLParser.parserConstants.PREVIEW_CSS_CLASS), FormToXMLParser
+		var elements = fox.mergeArrays(jQuery('#'
+				+ choosenForm.id + fox.foxConstants.PREVIEW_CSS_CLASS), fox
 				.findInputTags(formElements));
-		FormToXMLParser.writeXML(elements);
+		fox.writeXML(elements);
 		return false;
 	},
 	
@@ -304,29 +304,29 @@ var FormToXMLParser = {
 			var XML = new XMLWriter();
 			// write xml prolog
 			XML.WriteXMLProlog();
-			XML.WriteString(FormToXMLParser.parserConstants.NEW_LINE);
+			XML.WriteString(fox.foxConstants.NEW_LINE);
 			// write xml root tag
-			XML.BeginNode(FormToXMLParser.tag.DATA_SET);
-			XML.WriteString(FormToXMLParser.parserConstants.NEW_LINE);
+			XML.BeginNode(fox.tag.DATA_SET);
+			XML.WriteString(fox.foxConstants.NEW_LINE);
 			var locator;
 			for ( var i = 0; i < elementsArray.length; i++) {
-				var tagAndValue = FormToXMLParser
+				var tagAndValue = fox
 						.getTagValuePair(elementsArray[i]);
-				locator = FormToXMLParser.getLocator(elementsArray[i], true);
+				locator = fox.getLocator(elementsArray[i], true);
 				// If the element has id or name attribute we create a node
 				// in the xml for it. It will be skipped and logged
 				// otherwise.
 				if (locator != '') {
-					XML.WriteString(FormToXMLParser.parserConstants.TAB);
+					XML.WriteString(fox.foxConstants.TAB);
 					// write a new tag
 					XML.BeginNode(tagAndValue[0]);
-					FormToXMLParser.writeAttributes(XML, tagAndValue,
+					fox.writeAttributes(XML, tagAndValue,
 							locator);
-					FormToXMLParser.writeValue(XML, tagAndValue);
+					fox.writeValue(XML, tagAndValue);
 					// close the tag
 					XML.EndNode();
 					XML
-							.WriteString(FormToXMLParser.parserConstants.NEW_LINE);
+							.WriteString(fox.foxConstants.NEW_LINE);
 					locator = '';
 				}
 			}
@@ -337,11 +337,11 @@ var FormToXMLParser = {
 			// If we have found elements with no id or name attributes we
 			// write log in the output area for that.
 			if (missingLocatorsList.length > 1) {
-				xmlPlusLog += FormToXMLParser.parserConstants.NEW_LINE;
-				xmlPlusLog += FormToXMLParser.parserConstants.NEW_LINE;
+				xmlPlusLog += fox.foxConstants.NEW_LINE;
+				xmlPlusLog += fox.foxConstants.NEW_LINE;
 				xmlPlusLog += 'Elements with missing id or name attributes';
 				xmlPlusLog += '(elements with these values were skipped for xml):';
-				xmlPlusLog += FormToXMLParser.parserConstants.NEW_LINE;
+				xmlPlusLog += fox.foxConstants.NEW_LINE;
 				xmlPlusLog += missingLocatorsList.toString().substring(2);
 			}
 			document.getElementById('xmlOutput').value = xmlPlusLog;
@@ -352,7 +352,7 @@ var FormToXMLParser = {
 
 	/**
 	 * Writes attributes to action set xml for the current tag.
-	 * 
+	 *
 	 * @param XML
 	 *            XML writer object.
 	 * @param tagNvalue
@@ -361,24 +361,24 @@ var FormToXMLParser = {
 	 *            The locator to be set.
 	 */
 	writeAttributes : function(XML, tagNvalue, locator) {
-		if (tagNvalue[0] == FormToXMLParser.tag.GET) {
-			XML.Attrib(FormToXMLParser.attribute.LOCATOR, locator);
-			XML.Attrib(FormToXMLParser.attribute.ATTRIBUTE, '');
+		if (tagNvalue[0] == fox.tag.GET) {
+			XML.Attrib(fox.attribute.LOCATOR, locator);
+			XML.Attrib(fox.attribute.ATTRIBUTE, '');
 		} else {
-			XML.Attrib(FormToXMLParser.attribute.LOCATOR, locator);
+			XML.Attrib(fox.attribute.LOCATOR, locator);
 		}
 	},
 
 	/**
 	 * Writes value to action set xml for the current tag.
-	 * 
+	 *
 	 * @param XML
 	 *            XML writer object.
 	 * @param tagNvalue
 	 *            An array that contains tag name/value pair.
 	 */
 	writeValue : function(XML, tagNvalue) {
-		if (tagNvalue[0] == FormToXMLParser.tag.GET) {
+		if (tagNvalue[0] == fox.tag.GET) {
 			XML.WriteString('');
 		} else {
 			XML.WriteString(tagNvalue[1]);
@@ -389,29 +389,29 @@ var FormToXMLParser = {
 	 * According the provided tag name and type creates an array with two
 	 * elements: a tag name as string that will be used for xml creation and the
 	 * tag value which is get in different ways.
-	 * 
+	 *
 	 * @param tag
 	 *            The tag for which to create a tag name:value pair
 	 * @return An array
 	 */
 	getTagValuePair : function(tag) {
 		var tagNvalue = {};
-		if (tag.tagName.toLowerCase() == FormToXMLParser.tag.INPUT) {
-			if (tag.type == FormToXMLParser.type.CHECKBOX
-					|| tag.type == FormToXMLParser.type.RADIO) {
-				tagNvalue[0] = FormToXMLParser.tag.CHECK;
+		if (tag.tagName.toLowerCase() == fox.tag.INPUT) {
+			if (tag.type == fox.type.CHECKBOX
+					|| tag.type == fox.type.RADIO) {
+				tagNvalue[0] = fox.tag.CHECK;
 				tagNvalue[1] = '' + tag.checked;
 				return tagNvalue;
-			} else if (tag.type == FormToXMLParser.type.BUTTON
-					|| tag.type == FormToXMLParser.type.SUBMIT) {
-				tagNvalue[0] = tagNvalue[0] = FormToXMLParser.tag.CLICK;
+			} else if (tag.type == fox.type.BUTTON
+					|| tag.type == fox.type.SUBMIT) {
+				tagNvalue[0] = tagNvalue[0] = fox.tag.CLICK;
 				tagNvalue[1] = '';
-			} else if (tag.type == FormToXMLParser.type.TEXT
-					|| tag.type == FormToXMLParser.type.PASSWORD) {
-				tagNvalue[0] = tagNvalue[0] = FormToXMLParser.tag.SET;
+			} else if (tag.type == fox.type.TEXT
+					|| tag.type == fox.type.PASSWORD) {
+				tagNvalue[0] = tagNvalue[0] = fox.tag.SET;
 				tagNvalue[1] = tag.value;
 			}
-		} else if (tag.tagName.toLowerCase() == FormToXMLParser.tag.SELECT) {
+		} else if (tag.tagName.toLowerCase() == fox.tag.SELECT) {
 			if (tag.multiple == true) {
 				var valueString = '';
 				var opts = tag.options;
@@ -420,18 +420,18 @@ var FormToXMLParser = {
 						valueString += '|' + opts[int].text;
 					}
 				}
-				tagNvalue[0] = tagNvalue[0] = FormToXMLParser.tag.SELECT_MANY;
+				tagNvalue[0] = tagNvalue[0] = fox.tag.SELECT_MANY;
 				tagNvalue[1] = valueString == '|' ? '' : valueString
 						.substring(1);
 			} else if (tag.multiple == false) {
-				tagNvalue[0] = tagNvalue[0] = FormToXMLParser.tag.SET;
+				tagNvalue[0] = tagNvalue[0] = fox.tag.SET;
 				tagNvalue[1] = tag.value;
 			}
-		} else if (tag.tagName.toLowerCase() == FormToXMLParser.tag.TEXTAREA) {
-			tagNvalue[0] = tagNvalue[0] = FormToXMLParser.tag.SET;
+		} else if (tag.tagName.toLowerCase() == fox.tag.TEXTAREA) {
+			tagNvalue[0] = tagNvalue[0] = fox.tag.SET;
 			tagNvalue[1] = tag.value;
 		} else {
-			tagNvalue[0] = FormToXMLParser.tag.GET;
+			tagNvalue[0] = fox.tag.GET;
 			if (JSCommons.NavigatorType() == 0) { // if IE
 				tagNvalue[1] = tag.innerText;
 			} else { // if not IE
@@ -442,24 +442,24 @@ var FormToXMLParser = {
 	},
 
 	/**
-	 * Hides the parser's panel.
-	 * 
+	 * Hides the exporter's panel.
+	 *
 	 * @return
 	 */
 	hidePanel : function() {
-		document.getElementById(this.parserConstants.FORMS_TABLE_ID) ? document
-				.getElementById(this.parserConstants.FORMS_TABLE_ID).className = this.parserConstants.CSS_HIDDEN
+		document.getElementById(this.foxConstants.FORMS_TABLE_ID) ? document
+				.getElementById(this.foxConstants.FORMS_TABLE_ID).className = this.foxConstants.CSS_HIDDEN
 				: null;
-		document.getElementById(this.parserConstants.XML_OUTPUT_WRAPPER_ID) ? document
-				.getElementById(this.parserConstants.XML_OUTPUT_WRAPPER_ID).className = this.parserConstants.CSS_HIDDEN
+		document.getElementById(this.foxConstants.XML_OUTPUT_WRAPPER_ID) ? document
+				.getElementById(this.foxConstants.XML_OUTPUT_WRAPPER_ID).className = this.foxConstants.CSS_HIDDEN
 				: null;
-		document.getElementById(this.parserConstants.BUTTON_REFRESH).className = this.parserConstants.CSS_HIDDEN;
+		document.getElementById(this.foxConstants.BUTTON_REFRESH).className = this.foxConstants.CSS_HIDDEN;
 	},
 
 	/**
 	 * Finds out all type of input (text, button, submit, checkbox, radio),
 	 * textarea, select tags and creates an array with them.
-	 * 
+	 *
 	 * @param nodesArray
 	 *            An array that contains all found form elements.
 	 * @return An array that contains the found tags.
@@ -486,7 +486,7 @@ var FormToXMLParser = {
 	/**
 	 * Checks out the type of the input field for the once that should be
 	 * skipped.
-	 * 
+	 *
 	 * @param theNode
 	 *            the node which type should be checked
 	 * @return true if the node should be skipped and false otherwise
@@ -501,7 +501,7 @@ var FormToXMLParser = {
 
 	/**
 	 * Creates a cell (tag) with some text in it.
-	 * 
+	 *
 	 * @param tagName
 	 *            the tag that should be created
 	 * @param txt
@@ -513,6 +513,19 @@ var FormToXMLParser = {
 		cell.appendChild(document.createTextNode(txt));
 		return cell;
 	},
+	
+	/**
+	 * Shows a tooltip (wiz_tooltip.js) with predefined parameters and custom
+	 * text.
+	 * 
+	 * @param element
+	 *            the element that triggers this function and on which to apply
+	 *            the tooltip
+	 * @return
+	 */
+	show_tip_text : function(string) {
+		Tip(string, DELAY, 100, WIDTH, 300, BGCOLOR, '#fff');
+	},	
 
 	tag : {
 		SELECT_MANY : 'select-many',
@@ -561,19 +574,19 @@ var FormToXMLParser = {
 	},	
 
 	/**
-	 * The root tag for the parser component in the page.
+	 * The root tag for the exporter component in the page.
 	 */
-	PARSER_ROOT_TAG : null,
+	EXPORTER_ROOT_TAG : null,
 
 	/**
 	 * Common constants.
 	 */
-	parserConstants : {
+	foxConstants : {
 		BUTTON_REFRESH : 'refresh',
 		CSS_HIDDEN : 'hidden',
 		CSS_FORMS_TABLE : 'frmsTbl',
 		CSS_XML_OUTPUT_WRAPPER : 'outputShow',
-		PARSER_ROOT_ID : 'parser',
+		EXPORTER_ROOT_ID : 'exporter',
 		FORMS_TABLE_ID : 'foundFormsTable',
 		XML_OUTPUT_WRAPPER_ID : 'outField',
 		XML_OUTPUT_FIELD_ID : 'xmlOutput',
@@ -592,4 +605,4 @@ var FormToXMLParser = {
 	}
 }
 
-fox = FormToXMLParser;
+fox = FormToXMLExporter;
