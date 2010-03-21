@@ -44,26 +44,24 @@
 	<script type="text/javascript" src="js/formToXML.js"></script>
 	<script type="text/javascript" src="js/XMLWriter.js"></script>
 	
-    <center>
-		<div class="parserPanel" id="parser">
-			<div class="options" id="options">
-				<span onclick="fox.findFormsInPage(); return false;" id="findForms" class="optLink">find forms</span>
-				<span onclick="fox.hidePanel(); return false;" id="hidePanel" class="optLink">hide panel</span>        
-				<span onclick="fox.refreshOutput(); return false;" id="refresh" class="optLink hidden">refresh output</span>
-				<span onclick="fox.pickFields(); return false;" id="pickFields" class="optLink">pick fields</span>
-				<span onclick="fox.getActionSet(); return false;" id="getActionSet" class="optLink hidden">get action set</span>
-			</div>
-			<table id="pickTable" class="hidden">
-				<tr>
-					<th>tagName:locator</th>
-					<th>choose to remove</th>
-				</tr>
-			</table>
-			<div id="outField" class="hidden">
-				<div>XML output:</div>
-				<textarea readonly="true" id="xmlOutput"></textarea>
-			</div>
+	<div class="parserPanel" id="parser">
+		<div class="options" id="options">
+			<span onclick="fox.findFormsInPage(); return false;" id="findForms" class="optLink">find forms</span>
+			<span onclick="fox.hidePanel(); return false;" id="hidePanel" class="optLink">hide panel</span>        
+			<span onclick="fox.refreshOutput(); return false;" id="refresh" class="optLink hidden">refresh output</span>
+			<span onclick="fox.pickFields(); return false;" id="pickFields" class="optLink">pick fields</span>
+			<span onclick="fox.getActionSet(); return false;" id="getActionSet" class="optLink hidden">get action set</span>
 		</div>
-    </center>
+		<table id="pickTable" class="hidden">
+			<tr>
+				<th>tagName:locator</th>
+				<th>choose to remove</th>
+			</tr>
+		</table>
+		<div id="outField" class="hidden">
+			<div>XML output:</div>
+			<textarea readonly="true" id="xmlOutput"></textarea>
+		</div>
+	</div>
 </body>
 </html>
