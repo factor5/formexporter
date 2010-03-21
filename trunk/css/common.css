@@ -1,0 +1,838 @@
+/* -------------------------------------------------------------- 
+  
+   common.css
+   * Project specific and overriden css rullz.
+   
+-------------------------------------------------------------- */
+body {
+	font-family: Arial;
+	background-color: #FFFFFF;
+}
+
+fieldset {
+	border: 1px solid gray;
+	padding: 5px 2px 5px 2px;
+}
+
+fieldset legend {
+	font-size: 11px;
+	padding: 0px 3px 2px 3px;
+	margin-left: 5px;
+	font-weight: bold;
+}
+
+fieldset.padding-top {
+	padding-top: 5px;
+}
+
+/* the base style for all labels */
+label {
+	font-size: 10px;
+	color: #191970;
+	display: block;
+	clear: both;
+}
+
+/* THIS IS NOT WORKING because of the different order: label -> field */
+	/* checkboxes and radio buttons should have a label aligned on the same row */
+input[type=checkbox]+label,input[type=radio]+label {
+	display: inline;
+}
+
+ul li {
+	padding-bottom: 5px;
+}
+
+.tableCaption {
+	font-size: 11px;
+	font-weight: bold;
+}
+
+.tableHeader label {
+	font-size: 10px;
+	font-weight: bold;
+	color: #000;
+}
+
+.buttonStyle {
+	color: #000000;
+	font-weight: bold;
+	font-family: Verdana;
+	font-size: 11px;
+	/*display: block;
+	float: left;*/
+	margin: 0px 0px 0px 2px;
+	padding: 0px 2px 1px 2px;
+	background: #FFFFFF url('../img/layoutDefault/page-title-back.png')
+		no-repeat 0 -2px;
+	border: 1px outset #A1B5CA;
+	cursor: pointer;
+	height: 16px;
+}
+
+.buttonStyle:active {
+	border: 1px inset #A1B5CA;
+}
+
+/* style disabled and readonly buttons */
+input[disabled=disabled].buttonStyle {
+	cursor: default;
+	color: gray;
+}
+
+.buttonStyleDisabled {
+	cursor: default;
+	color: gray;
+}
+
+.buttonColumn {
+	text-align: center;
+}
+
+/* Position calculate excise button at the right only for Licensing */
+input[name$='calcVolumesBtn'][id^='licensing'],
+input[name$='addWorkAddrBtn'][id^='obligatoryRegistration'] {
+      float:right;
+      margin-right: 25px;
+}
+
+/* all input fields are styled on container basis 
+(all descendant input fields will get those styles) */
+.styledInput input[type=text],.styledInput input[type=password],.styledInput textarea,.styledInput select
+	{
+	background-color: #FFF;
+	font-family: Courier New;
+	font-size: 12px;
+	/* decrease the distance between label and input 
+    margin-top: -2px;*/
+	border-top: 1px solid #808080;
+	border-left: 1px solid #808080;
+	border-right: 1px solid #DCDCDC;
+	border-bottom: 1px solid #DCDCDC;
+}
+
+/* Applies a marker on interactive fields and prevents overriding the background color.
+   Left padding is applied to prevent overlapping the text from the marker. */
+input.interactiveField {
+	background-image: url('../img/interactiveField.gif');
+	background-position: top left;
+	background-repeat: no-repeat;
+	padding-left: 3px;
+}
+
+div.checkboxContainer {
+	padding: 0px 0px 10px 0px;
+}
+
+div.checkboxContainer input {
+	vertical-align: text-bottom;
+	margin: 0;
+}
+
+/* RNC styles
+-------------------------------------------------------------- */
+.preview {
+	font-size: 11px;
+	text-align: left;
+	display: block;
+	/* width: 100%; */
+}
+
+.preview ul li {
+	list-style-type: none;
+}
+
+/*
+Because class sets the width of the cells to be 100% and to be 
+inline we should override theese for checkboxes and radio buttons.
+*/
+.labelInline input[type=checkbox].preview,
+.labelInline input[type=radio].preview,
+.labelInline span.preview,
+.labelInline span.unchecked,
+.labelInline span.checked {
+	width: auto;
+	display: inline-block;
+}
+
+/* 
+ THIS IS HACK - DON'T REMOVE OR MODIFY
+ This pseudoclass adds some invisible content after
+ the content of the tag selected by the preview selector.
+ This is done because if there is no content browser will
+ not render the tag and so the tooltip may not be triggered. 
+*/
+.preview:after {
+	content: ".";
+	visibility: hidden;
+}
+
+/* 'unchecked' is style class that is applied inline by the checkbox renderer. */
+span .unchecked {
+	background: url('../img/checkbox-unchecked.gif') no-repeat;
+	width: 13px !important;
+	height: 13px;
+	border: none;
+}
+
+/* 'checked' is style class that is applied inline by the checkbox renderer. */
+span.checked {
+	background: #FFFFFF url('../img/checkbox-checked.gif') no-repeat;
+	width: 13px !important;
+	height: 13px;
+	border: none;
+}
+
+.disabled {
+	background-color: #DEDEDE !important;
+	border: 1px solid gray;
+}
+
+.required {
+	background-color: #FFFACD !important;
+	border: 1px solid LightSalmon;
+	color: #000000 !important;
+}
+
+.warning {
+	background-color: gold !important;
+	border: 1px solid gray;
+}
+
+.invalid {
+	background-color: LightSalmon !important;
+	border: 1px solid gray;
+}
+
+.hidden {
+	display: none;
+}
+
+/* Overriden from blueprint framework
+-------------------------------------------------------------- */
+textarea {
+	margin: 0px 0px;
+	height: 60px;
+}
+
+ul {
+	margin: 0px;
+}
+
+table {
+	margin-bottom: 0px;
+	width: 100%;
+}
+
+.btnColumnId {
+	text-align: center;
+}
+
+/* Datatable classes
+-------------------------------------------------------------- */
+	/* richfaces classes */
+.rich-table-header,.rich-table-header {
+	background-color: #FFFFFF;
+	background-image: none;
+}
+
+.rich-table {
+	background-color: #FFFFFF;
+}
+
+.rich-table-cell {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+/* end of richfaces classes */
+.dataTable {
+	border: none;
+	margin-bottom: 10px;
+}
+
+.row-hover tbody tr:hover {
+	background-color: #CCFFFF;
+}
+
+/* Applies hover effect over all table rows. */
+.scrolerTable tr:hover {
+	background-color: transparent !important;
+}
+
+.dataTable tr td,.dataTable tr th {
+	border: 1px solid #000000;
+	padding: 2px;
+}
+
+.dataTableHeader th {
+	font-size: 12px;
+	text-align: center;
+	background: #D3D3D3;
+}
+
+.dataTableFooter {
+	background-color: transparent;
+}
+
+/* Defines the style of the table caption. */
+tr th.tableCaption {
+	color: #FFFFFF;
+	background: transparent url('../img/header-back.gif') repeat-x top left
+		!important;
+	padding: 0px 0px 0px 0px;
+	text-align: left;
+}
+
+.tableCaption div {
+	padding: 0px 0px 0px 3px !important;
+	height: 18px !important;
+	border: none !important;
+}
+
+/* Because we override dr-table-cell in order to remove the cell 
+padding to provide default behavior we need to apply it where necessary. */
+.datatableWithCellPadding tr td {
+	padding-left: 4px;
+	padding-right: 2px;
+}
+
+/* Makes the link in the table cell to span the whole area in order. */
+.dataTable tr td a {
+	display: block;
+	width: 100%;
+	padding-left: 0px;
+	color: #000000;
+}
+
+/* Project specific styles for search tables. */
+.rich-table-header-continue {
+	background-color: #FFFFFF;
+}
+
+table thead tr.rich-table-header-continue th {
+	/*padding: 2px 4px 1px 2px;*/
+	color: #000000;
+}
+
+table thead tr th.colGroupName,table thead tr th.colUserState {
+	padding: 2px 1px 2px 2px;
+}
+
+/* Rich datatable scroler classes
+-------------------------------------------------------------- */
+.scrolerTable {
+	width: auto;
+	border: none;
+	font-family: Arial;
+	font-size: 10px;
+	background-color: transparent;
+}
+
+.rich-datascr-button,.rich-datascr-sepctrl {
+	border: none;
+}
+
+.scrolerTable th,.scrolerTable td,.scrolerTable caption {
+	padding: 0px;
+	color: #000000;
+	background-color: transparent;
+	font-family: Arial;
+	font-size: 10px;
+}
+
+.rich-datascr-act {
+	width: 15px;
+	border-bottom: 2px solid black;
+}
+
+.rich-datascr-inact {
+	width: 15px;
+	border-top-style: none;
+}
+
+/* Set some vertical space between the datatable and the scroller */
+div.rich-datascr {
+	padding-top: 10px;
+}
+
+/*
+Because there are data scrollers inside some data tables we need 
+to override some data table styles inherited in scrollers.
+*/
+.dataTableFooter .scrolerTable tr td {
+	border: none;
+}
+
+.dataTableFooter .rich-datascr-act {
+	width: 15px;
+	border-top: 2px solid black !important;
+	border-bottom: 2px solid black !important;
+}
+
+.dataTableFooter .rich-datascr {
+	padding-top: 3px;
+	padding-bottom: 3px;
+}
+
+.dataTableFooter .scrolerTable td {
+	padding: 0px;
+}
+
+/* Button and link classes
+-------------------------------------------------------------- */
+	/* Used for styling the button that is default in the page */
+.btnDefault,input[type=submit].btnDefault {
+	background-color: #f5f5f5;
+	border-top: 2px solid #ADD8E6;
+	border-right: 2px solid #6495ED;
+	border-bottom: 2px solid #6495ED;
+	border-left: 2px solid #ADD8E6;
+	cursor: pointer;
+}
+
+/* apply this class on input type=button/submit */
+.btnNormal,input[type=submit].btnNormal {
+	background-color: #f5f5f5;
+	border-top: 2px solid #dcdcdc;
+	border-right: 2px solid #808080;
+	border-bottom: 2px solid #808080;
+	border-left: 2px solid #dcdcdc;
+	cursor: pointer;
+}
+
+.searchButton {
+	color: #000000;
+	font-weight: bolder;
+	font-size: 12px;
+	padding: 0px 2px 0px 2px;
+	background: #FFFFFF url('../img/layoutDefault/page-title-back.png')
+		no-repeat 0 -2px;
+	border: 1px outset #A1B5CA;
+	cursor: pointer;
+}
+
+.btnSertificate {
+	margin-bottom: -3px;
+	margin-left: 5px;
+}
+
+/* Error messages block classes.
+-------------------------------------------------------------- */
+.globalErrorsBlock {
+	width: 968px;
+	margin: 0 auto;
+	font-size: 12px;
+	padding: 5px 2px 5px 2px;
+	color: #FF0000;
+	background-color: #FFFFFF;
+}
+
+.errorMessage {
+	display: block;
+	color: red;
+}
+
+/* Positionning and aligning
+-------------------------------------------------------------- */
+.bottomMargin {
+	margin-bottom: 10px;
+}
+
+.bottomPadding {
+	padding-bottom: 10px;
+}
+
+.topMargin {
+	margin-top: 10px;
+}
+
+.leftMargin5 {
+	margin-left: 5px;
+}
+
+.topPadding {
+	padding-top: 10px;
+}
+
+.floatLeft {
+	float: left;
+}
+
+.floatRight {
+	float: right;
+}
+
+.clearRight {
+	clear: right;
+}
+
+.textRight {
+	text-align: right;
+}
+
+.topAlign {
+	vertical-align: top;
+}
+
+.inlineBlock {
+	display: inline-block;
+}
+
+/* Miscs
+-------------------------------------------------------------- */
+	/* Applied on wrapper of the list this will remove the bullets
+   or numbers of the list items. */
+.noBullets li {
+	list-style-type: none;
+}
+
+/* 
+Radio button group that is styled as inline flow of radio
+button and label. If available space is not enough the flow 
+continues on next line. The width is specified according to
+the width of one column from the grid.css stylesheet. 
+*/
+.radioButtonGroup td {
+	display: inline-block;
+	vertical-align: top;
+	width: 157px; /* one column width */
+	padding-bottom: 5px;
+}
+
+.radioButtonGroup td input {
+	display: block;
+	float: left;
+}
+
+.radioButttonGroup td label {
+	display: inline;
+}
+
+/*
+Mostly used for cells that contains checkboxes and radio buttons 
+in order to make the labels in that cells to be inline with their fields.
+*/
+.labelInline input {
+	float: left;
+	margin-top: 0px;
+}
+
+.labelInline label {
+	display: inline;
+	vertical-align: top;
+}
+
+.pointer-cursor tbody tr {
+	cursor: pointer;
+}
+
+/* CALENDAR STYLE CLASSES
+-------------------------------------------------------------- */
+.btnToday {
+	color: #FF0000 !important;
+	border: 1px solid black;
+	padding: 1px !important;
+}
+
+table.jCalendar {
+	border: 1px solid #000;
+	background: #ADD8E6; /* lightblue */
+	border-collapse: separate;
+	border-spacing: 2px;
+	table-layout: fixed;
+}
+
+table.jCalendar th {
+	background: #B0C4DE; /* lightsteelblue */
+	color: #000000;
+	font-weight: bold !important;
+	padding: 3px 0;
+	text-align: center;
+}
+
+table.jCalendar th.weekday {
+	
+}
+
+table.jCalendar th.weekend {
+	color: #323232;
+	background: #BAC4DA;
+}
+
+table.jCalendar td {
+	background: #F0F8FF; /* aliceblue */
+	color: #000000;
+	padding: 3px 0;
+	text-align: center;
+}
+
+table.jCalendar td.weekday {
+	
+}
+
+table.jCalendar td.weekend {
+	background: #FAFCFF;
+	color: #800000;
+}
+
+table.jCalendar td.other-month {
+	background: #ddd;
+	color: #aaa;
+}
+
+table.jCalendar td.today {
+	background: #666;
+	color: #fff;
+}
+
+table.jCalendar td.selected {
+	background: #f66;
+	color: #fff;
+}
+
+table.jCalendar td.selected:hover {
+	background: #f33;
+	color: #fff;
+}
+
+table.jCalendar td:hover,table.jCalendar td.dp-hover {
+	background: #FFFFFF;
+	color: #000000;
+}
+
+table.jCalendar td.disabled,table.jCalendar td.disabled:hover {
+	background: #bbb;
+	color: #888;
+}
+
+/* For the popup */
+	/* NOTE - you will probably want to style a.dp-choose-date - see how I did it in demo.css */
+div.dp-popup {
+	position: relative;
+	background: #F5F5F5;
+	font-size: 10px;
+	font-family: arial, sans-serif;
+	padding: 2px;
+	width: 210px;
+	line-height: 1.2em;
+}
+
+div#dp-popup {
+	position: absolute;
+	z-index: 199;
+}
+
+div.dp-popup h2 {
+	font-size: 12px;
+	text-align: center;
+	margin: 2px 0;
+	padding: 0;
+}
+
+a#dp-close {
+	font-size: 11px;
+	padding: 4px 0;
+	text-align: center;
+	display: block;
+}
+
+a#dp-close :hover {
+	text-decoration: underline;
+}
+
+div.dp-popup a {
+	color: #000;
+	text-decoration: none;
+	padding: 3px 2px 0;
+}
+
+div.dp-popup div.dp-nav-prev {
+	position: absolute;
+	top: 2px;
+	left: 4px;
+	width: 100px;
+}
+
+div.dp-popup div.dp-nav-prev a {
+	float: left;
+}
+
+/* Opera needs the rules to be this specific otherwise it 
+doesn't change the cursor back to pointer after you have 
+disabled and re-enabled a link */
+div.dp-popup div.dp-nav-prev a,div.dp-popup div.dp-nav-next a {
+	cursor: pointer;
+}
+
+div.dp-popup div.dp-nav-prev a.disabled,div.dp-popup div.dp-nav-next a.disabled
+	{
+	cursor: default;
+}
+
+div.dp-popup div.dp-nav-next {
+	position: absolute;
+	top: 2px;
+	right: 4px;
+	width: 100px;
+}
+
+div.dp-popup div.dp-nav-next a {
+	float: right;
+}
+
+div.dp-popup a.disabled {
+	cursor: default;
+	color: #aaa;
+}
+
+div.dp-popup td {
+	cursor: pointer;
+}
+
+div.dp-popup td.disabled {
+	cursor: default;
+}
+
+/*  ------------ end calendar classes ---------*/ /* TOOLTIP CLASSES
+-------------------------------------------------------------- */
+.tooltip {
+	display: none;
+}
+
+.tooltip_error {
+	color: red;
+	display: block;
+	width: 300px;
+	font-weight: bold;
+}
+
+.tooltip_warning {
+	color: #BF8500;
+	display: block;
+	width: 300px;
+	font-weight: bold;
+}
+
+.tooltip_info {
+	color: #1e9f2a;
+	width: 300px;
+	display: block;
+	font-weight: bold;
+}
+
+.grLabelReq {
+	color: #FFCC00;
+}
+
+.grLabelErr {
+	color: red;
+}
+
+/* Codelist Suggest Modal Panel
+-------------------------------------------------------------- */
+.codelistSuggestModalPanel * {
+	vertical-align: top !important;
+}
+
+.codelistSuggestFilterField {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	width: 99%;
+}
+
+.codelistSuggestFilterFieldContainer {
+	float: left;
+	width: 47%;
+	background-color: #808080;
+}
+
+.codelistSuggestDataTable {
+	border-width: 0 0 0 0;
+	width: 100%;
+}
+
+.codelistSuggestDataTableFooter {
+	padding: 0 0 0 0;
+	margin: 0 0 0 0;
+	border-width: 0 0 0 0;
+	background-color: #FFFFFF;
+}
+
+.codevalueCell {
+	background-color: #F0F0F0;
+	border-bottom: 1px solid #FFFFFF;
+	cursor: pointer;
+}
+
+.firstCodevalueCell {
+	padding: 0 1em 0 1em;
+	border-width: 0 0 0 0;
+	background-color: #D0D0D0;
+	border-right: 1px solid #000000;
+	font-family: monospace;
+}
+
+.secondCodevalueCell {
+	width: 100%;
+	padding: 0 0 0 0;
+	border-width: 0 0 0 0;
+	padding-left: 0.5em;
+	white-space: normal;
+}
+
+.codelistTableRowHover .firstCodevalueCell {
+	background-color: #323232 !important;
+	border-right-color: #808080;
+	color: #FFFFFF !important;
+}
+
+.codelistTableRowHover .secondCodevalueCell,.codelistTableRowHoverMultiAdd .secondCodevalueCell,.codelistTableRowHoverMultiRemove .secondCodevalueCell
+	{
+	background-color: #000000 !important;
+	color: #FFFFFF !important;
+}
+
+.codelistTableRowHoverMultiRemove .firstCodevalueCell {
+	background-color: #FF0000 !important;
+	border-right-color: #808080;
+}
+
+.codelistTableRowHoverMultiAdd .firstCodevalueCell {
+	background-color: #00FF00 !important;
+	border-right-color: #808080;
+}
+
+/* rich:tab styling */
+.rich-tab-inactive {
+	cursor: pointer;
+}
+
+.rich-tab-header {
+	padding-left: 0px;
+	padding-right: 0px;
+}
+
+.rich-tab-header.constraintError {
+	color: Red;
+	font-weight: bolder;
+}
+
+.rich-tab-header.warning {
+	color: Coral;
+	font-weight: bolder;
+}
+
+.rich-tabpanel-content {
+	padding-top: 5px;
+	border: none;
+	background-color: transparent;
+}
+
+/* Loading mask style
+-------------------------------------------------------------- */
+.loadingMask {
+	opacity: 0.9;
+	-moz-opacity: .90;
+	display: none;
+}
