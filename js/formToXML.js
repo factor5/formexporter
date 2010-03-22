@@ -20,13 +20,24 @@ var selectedForm = new Object();
  * </code>
  */
 var FormToXMLExporter = {
-	
-	init : function() {
-		fox.createFoxToolbar();
+
+	runtime : {
+		isPickHandlerActive : false
 	},
 	
-	createFoxToolbar : function() {
+	/**
+	 * Initializing function called onload to create interface and to initialize the configuration.
+	 */
+	init : function() {
+		fox.createInterface();
+	},
+	
+	/**
+	 * Creates the interface.
+	 */
+	createInterface : function() {
 		var foxRoot = jQuery('#' + fox.foxConstants.EXPORTER_ROOT_ID);
+		// create the options toolbar
 		var toolbar = fox.elementProvider(fox.foxComponent.TOOLBAR);
 		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_FIND_FORMS));
 		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_HIDE_PANEL));
@@ -35,6 +46,7 @@ var FormToXMLExporter = {
 		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_PICK_FIELDS));
 		jQuery(toolbar).append(fox.elementProvider(fox.foxComponent.OPT_GET_ACTIONSET));
 		jQuery(foxRoot).append(toolbar);
+		// create the pick table
 		var pickTable = fox.elementProvider(fox.foxComponent.PICK_TABLE);
 		var pickTableHeader = jQuery('<tr/>');
 		jQuery(pickTableHeader).append(fox.elementProvider(fox.foxComponent.PICK_TABLE_TH1));
@@ -43,6 +55,22 @@ var FormToXMLExporter = {
 		jQuery(foxRoot).append(pickTable);
 	},
 	
+	/**
+	 * Utility function used to create and set-up html components.
+	 * 
+	 * @param comp
+	 *            Json object with configuration needed to create the needed
+	 *            html tag:
+	 * @format comp:  { 
+	 *            		tagType:'<span/>', 
+	 *              	cid:'theId',
+	 *              	cssClass:'preview', 
+	 *             	 	text:'text to apply',
+	 *              	evt:'click', 
+	 *              	handler:function(){alert();}
+	 *            	  }
+	 * @return The created html component as jquery object.
+	 */
 	elementProvider : function(comp) {
 		var created = jQuery(comp.tagType).append(comp.txt).addClass(comp.cssClass).attr('id', comp.cid);
 		if (comp.evt != undefined && comp.handler != undefined) {
@@ -50,19 +78,42 @@ var FormToXMLExporter = {
 		}
 		return created;
 	},
+	
+	/**
+	 * Ataches handler functions that shows info for pointed html tag in tooltip.
+	 */	
+	showInfo : function() {
+		if (!fox.runtime.isPickHandlerActive) {
+			var container = document.body;
+			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
+			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);	
+			fox.runtime.isPickHandlerActive = true;
+		}
+	},
 
+	/**
+	 * 
+	 */
 	pickFields : function() {		
 		var container = document.getElementById('container');
-		JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
-		JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
+		if (!fox.runtime.isPickHandlerActive) {
+			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
+			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
+			fox.runtime.isPickHandlerActive = true;
+		}
 		JSCommons.AddEventHandler(container, fox.jsEvent.CLICK, fox.pickHandler);
 		var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
-		JSCommons.RemoveStyleClass(pickTable, 'hidden');	
-		JSCommons.RemoveStyleClass( document.getElementById('getActionSet'), 'hidden');	
+		JSCommons.RemoveStyleClass(pickTable, fox.foxConstants.CSS_HIDDEN);	
+		JSCommons.RemoveStyleClass(document.getElementById('getActionSet'), fox.foxConstants.CSS_HIDDEN);	
 		JSCommons.AddEventHandler(pickTable, fox.jsEvent.CLICK, fox.removeFromBucket);		
 		fox.pickedList = new Array();
 	},
 	
+	
+	
+	/**
+	 * 
+	 */
 	removeFromBucket : function(evt) {
 		var source = JSCommons.SrcElement(evt);	
 		var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
@@ -72,18 +123,39 @@ var FormToXMLExporter = {
 		}
 	},
 	
+	/**
+	 * Finds the source of the event fired and applies css class to highlight
+	 * the component under the mouse pointer. Calls function that creates the
+	 * info for the pointed tag and it is shown as tooltip.
+	 * 
+	 * @param evt
+	 *            The source target.
+	 */
 	highlightSource : function(evt) {
 		var source = JSCommons.SrcElement(evt);	
-		JSCommons.AddStyleClass(source, 'highlight');
+		JSCommons.AddStyleClass(source, fox.foxConstants.CSS_HIGHLIGHT);
 		fox.show_tip_text(fox.createTooltipContent(source, fox.getLocators(source)));
 	},
 	
+	/**
+	 * Removes the highlighting css class and tooltip.
+	 * 
+	 * @param evt The source target.
+	 */
 	unHighlightSource : function(evt) {
 		var source = JSCommons.SrcElement(evt);
-		JSCommons.RemoveStyleClass(source, 'highlight');
+		JSCommons.RemoveStyleClass(source, fox.foxConstants.CSS_HIGHLIGHT);
 		UnTip(source);
 	},
 	
+	/**
+	 * Creates and returns the locators for provided html tag.
+	 * 
+	 * @param el
+	 *            The html tag for which to find locators. Locators are set in
+	 *            json object and it is returned as result.
+	 * @return An object that wraps the locators for provided tag.
+	 */
 	getLocators : function(el) {
 		var locators = {
 			locatorId : el.id,
@@ -93,10 +165,27 @@ var FormToXMLExporter = {
 		return locators;
 	},
 	
+	/**
+	 * Creates and return a xpath locator.
+	 * 
+	 * @param el
+	 *            The html tag for which to create xpath locator.
+	 * @return 
+	 */
 	getXpath : function(el) {
 		return 'test xpath';
 	},
 	
+	/**
+	 * Creates html structure that will be displayed in the tooltip for provided
+	 * element.
+	 * 
+	 * @param el
+	 *            The html tag for which to create info.
+	 * @param locators
+	 *            Locators for provided tag element.
+	 * @return Created info.
+	 */
 	createTooltipContent : function(el, locators) {
 		var content = '<span style="color:red">tag name:</span>';
 		content += '<span style="color:green">' + el.tagName + '</span><br />';
@@ -109,6 +198,9 @@ var FormToXMLExporter = {
 		return content;
 	},
 
+	/**
+	 * 
+	 */
 	pickHandler : function(evt) {
 		var source = JSCommons.SrcElement(evt);
 		var picked = '<tr><td>';
@@ -120,6 +212,9 @@ var FormToXMLExporter = {
 		return false;
 	},	
 	
+	/**
+	 * 
+	 */
 	getActionSet : function() {
 		var container = document.getElementById('container');
 		JSCommons.RemoveEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
@@ -615,6 +710,7 @@ var FormToXMLExporter = {
 		BUTTON_REFRESH 			: 'refresh',
 		CSS_HIDDEN 				: 'hidden',
 		CSS_FORMS_TABLE 		: 'frmsTbl',
+		CSS_HIGHLIGHT	 		: 'highlight',
 		CSS_XML_OUTPUT_WRAPPER 	: 'outputShow',
 		EXPORTER_ROOT_ID 		: 'exporter',
 		FORMS_TABLE_ID 			: 'foundFormsTable',
@@ -639,7 +735,7 @@ var FormToXMLExporter = {
 		OPT_FIND_FORMS 		: { tagType : '<span />', cid : 'findForms', cssClass : 'optLink', txt : 'Find forms', evt : 'click', handler : function(){fox.findFormsInPage();}},
 		OPT_HIDE_PANEL 		: { tagType : '<span />', cid : 'hidePanel', cssClass : 'optLink', txt : 'Hide panel', evt : 'click', handler : function(){fox.hidePanel();}},
 		OPT_REFRESH 		: { tagType : '<span />', cid : 'refresh', cssClass : 'optLink hidden', txt : 'Refresh', evt : 'click', handler : function(){fox.refreshOutput();}},
-		OPT_SHOW_INFO 		: { tagType : '<span />', cid : 'showInfo', cssClass : 'optLink', txt : 'Show info', evt : 'click', handler : function(){fox.getActionSet();}},
+		OPT_SHOW_INFO 		: { tagType : '<span />', cid : 'showInfo', cssClass : 'optLink', txt : 'Show info', evt : 'click', handler : function(){fox.showInfo();}},
 		OPT_PICK_FIELDS 	: { tagType : '<span />', cid : 'pickFields', cssClass : 'optLink', txt : 'Pick fields', evt : 'click', handler : function(){fox.pickFields();}},
 		OPT_GET_ACTIONSET	: { tagType : '<span />', cid : 'getActionSet', cssClass : 'optLink hidden', txt : 'Get actionset', evt : 'click', handler : function(){fox.getActionSet();}},
 		PICK_TABLE			: { tagType : '<table />', cid : 'pickTable', cssClass : 'hidden', txt : ''},
