@@ -20,9 +20,10 @@ var selectedForm = new Object();
  * </code>
  */
 var FormToXMLExporter = {
-
-	runtime : {
-		isPickHandlerActive : false
+	
+	pluginState : {
+		started_showInfo : false,
+		started_pickFields : false
 	},
 	
 	/**
@@ -83,11 +84,40 @@ var FormToXMLExporter = {
 	 * Ataches handler functions that shows info for pointed html tag in tooltip.
 	 */	
 	showInfo : function() {
-		if (!fox.runtime.isPickHandlerActive) {
+		if (!fox.pluginState.started_pickFields) {
 			var container = document.body;
 			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
 			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);	
-			fox.runtime.isPickHandlerActive = true;
+			JSCommons.AddEventHandler(document, fox.jsEvent.KEY_UP, fox.stopPlugin);	
+			fox.pluginState.started_showInfo = true;
+		}
+	},
+	
+	/**
+	 * Stops all activated before functions that are part of this plugin. Event handlers are detached.
+	 * Resources that were taken are freed. The state of the plugin is reset. Interface is reset too.
+	 * 
+	 * @param evt
+	 *            The source target.
+	 */	
+	stopPlugin : function(evt) {
+		var kc = evt.keyCode;
+		if (kc == 27) {
+			if (fox.pluginState.started_showInfo || fox.pluginState.started_pickFields) {
+				var container = document.body;	
+				JSCommons.RemoveEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
+				JSCommons.RemoveEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
+				JSCommons.RemoveEventHandler(container, fox.jsEvent.CLICK, fox.pickHandler);
+				JSCommons.RemoveEventHandler(document, fox.jsEvent.KEY_UP, fox.stopPlugin);
+				var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
+				JSCommons.RemoveEventHandler(pickTable, fox.jsEvent.CLICK, fox.removeFromBucket);
+				JSCommons.AddStyleClass(pickTable, fox.foxConstants.CSS_HIDDEN);	
+				JSCommons.AddStyleClass(document.getElementById('getActionSet'), fox.foxConstants.CSS_HIDDEN);					
+				fox.pickedList = undefined;
+				// TODO must clear pickTable too
+				UnTip(currentElement);
+				JSCommons.RemoveStyleClass(currentElement, fox.foxConstants.CSS_HIGHLIGHT);
+			}
 		}
 	},
 
@@ -95,12 +125,13 @@ var FormToXMLExporter = {
 	 * 
 	 */
 	pickFields : function() {		
-		var container = document.getElementById('container');
-		if (!fox.runtime.isPickHandlerActive) {
+		var container = document.body;
+		if (!fox.pluginState.started_pickFields) {
 			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OVER, fox.highlightSource);
 			JSCommons.AddEventHandler(container, fox.jsEvent.MOUSE_OUT, fox.unHighlightSource);
-			fox.runtime.isPickHandlerActive = true;
+			fox.pluginState.started_pickFields = true;
 		}
+		JSCommons.AddEventHandler(document, fox.jsEvent.KEY_UP, fox.stopPlugin);
 		JSCommons.AddEventHandler(container, fox.jsEvent.CLICK, fox.pickHandler);
 		var pickTable = document.getElementById(fox.foxConstants.PICK_TABLE_ID);
 		JSCommons.RemoveStyleClass(pickTable, fox.foxConstants.CSS_HIDDEN);	
@@ -123,6 +154,8 @@ var FormToXMLExporter = {
 		}
 	},
 	
+	currentElement : null,
+	
 	/**
 	 * Finds the source of the event fired and applies css class to highlight
 	 * the component under the mouse pointer. Calls function that creates the
@@ -133,8 +166,9 @@ var FormToXMLExporter = {
 	 */
 	highlightSource : function(evt) {
 		var source = JSCommons.SrcElement(evt);	
+		currentElement = source;
 		JSCommons.AddStyleClass(source, fox.foxConstants.CSS_HIGHLIGHT);
-		fox.show_tip_text(fox.createTooltipContent(source, fox.getLocators(source)));
+		fox.show_tip_text(fox.createTooltipContent(source, fox.getLocators(source), fox.getCssClasses(source)));
 	},
 	
 	/**
@@ -146,6 +180,18 @@ var FormToXMLExporter = {
 		var source = JSCommons.SrcElement(evt);
 		JSCommons.RemoveStyleClass(source, fox.foxConstants.CSS_HIGHLIGHT);
 		UnTip(source);
+		currentElement = null;
+	},
+	
+	/**
+	 * Finds out the css classes that are applied on provided tag and returns them as the 'highlight' 
+	 * class used by this application is removed first.
+	 * 
+	 * @param el The tag which classes to be found.
+	 */
+	getCssClasses : function(el) {
+		var clName = el.className;
+		return clName.replace(' ' + fox.foxConstants.CSS_HIGHLIGHT, '');;
 	},
 	
 	/**
@@ -186,7 +232,7 @@ var FormToXMLExporter = {
 	 *            Locators for provided tag element.
 	 * @return Created info.
 	 */
-	createTooltipContent : function(el, locators) {
+	createTooltipContent : function(el, locators, classes) {
 		var content = '<span style="color:red">tag name:</span>';
 		content += '<span style="color:green">' + el.tagName + '</span><br />';
 		if (locators.length != 0) {
@@ -194,6 +240,9 @@ var FormToXMLExporter = {
 			content += (locators.locatorId) ? ('<span style="color:blue;">id=</span><span style="color:green;">' + locators.locatorId + '</span><br />') : ('');
 			content += (locators.locatorName) ? ('<span style="color:blue;">name=</span><span style="color:green">' + locators.locatorName + '</span><br />') : ('');
 			content += '<span style="color:blue;">xpath=</span><span style="color:green">' + locators.locatorXpath + '</span><br />';
+		}
+		if (classes.length != 0) {
+			content += '<span style="color:blue;">css classes:</span><span style="color:green">' + classes + '</span><br />';
 		}
 		return content;
 	},
@@ -727,7 +776,8 @@ var FormToXMLExporter = {
 	jsEvent : {
 		CLICK 		: 'click',
 		MOUSE_OVER 	: 'mouseover',
-		MOUSE_OUT 	: 'mouseout'
+		MOUSE_OUT 	: 'mouseout',
+		KEY_UP : 'keyup'
 	},
 	
 	foxComponent : {
