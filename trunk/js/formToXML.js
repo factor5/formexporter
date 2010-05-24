@@ -666,8 +666,7 @@ var FormToXMLExporter = {
 	 * @return true if the node should be skipped and false otherwise
 	 */
 	skipNode : function(theNode) {
-		if (theNode.getAttribute(this.attribute.TYPE) == this.type.HIDDEN
-				|| theNode.getAttribute(this.attribute.TYPE) == this.type.BUTTON) {
+		if (theNode.getAttribute(this.attribute.TYPE) == this.type.HIDDEN) {
 			return true;
 		}
 		return false;
