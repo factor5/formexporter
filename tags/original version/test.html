@@ -1,0 +1,56 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <title>Form Exporter test page</title>
+	<link rel="stylesheet" type="text/css" href="css/grid.css">
+	<link rel="stylesheet" type="text/css" href="css/fox.css">
+	<link rel="stylesheet" type="text/css" href="css/common.css">
+	<script type="text/javascript" src="js/JSCommonFunctions.js"></script>	
+	<script type="text/javascript" src="js/common.js"></script>
+	<script type="text/javascript" src="js/jquery.js"></script>
+	<script type="text/javascript" src="js/formToXML.js"></script>
+	<script type="text/javascript" src="js/XMLWriter.js"></script>	
+	<script>
+		jQuery(document).ready(function () {
+			fox.init();
+		});
+	</script>
+</head>
+<body>	
+	<script type="text/javascript" src="js/wz_tooltip.js"></script>
+
+	<div class="container styledInput" id="container">
+		<form id="form1">
+			<div class="span-12">
+				<span class="span-6">
+					<label>label 1</label>
+					<input type="text" id="in1" class="span-6" value="John Doe"></input>
+				</span>
+				<span class="span-6 last">
+					<label>label 1</label>
+					<input type="text" id="in2" class="span-6" value="Aaslkd Klaskdj"></input>
+				</span>		
+			</div>	
+			<div class="span-12">
+				<span class="span-6">
+					<label>label 1</label>
+					<span type="text" id="inputInPreview1" class="span-6 preview">preview 1</span>
+				</span>
+				<span class="span-6 last">
+					<label>label 1</label>
+					<span type="text" id="inputInPreview2" class="span-6 preview">preview 2</span>
+				</span>		
+			</div>	
+			<input type="submit" value="save" id="saveButton"></input>
+			<input type="submit" value="reset" id="resetButton"></input>
+		</form>
+	</div>
+			
+	<div class="spacer spaceBottom"></div>
+	
+	<div class="exporterPanel" id="exporter">
+
+	</div>
+</body>
+</html>
