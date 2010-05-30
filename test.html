@@ -9,13 +9,19 @@
 	<script type="text/javascript" src="js/JSCommonFunctions.js"></script>	
 	<script type="text/javascript" src="js/common.js"></script>
 	<script type="text/javascript" src="js/jquery.js"></script>
-	<script type="text/javascript" src="js/formToXML.js"></script>
+	<script type="text/javascript" src="js/formExporter.js"></script>
 	<script type="text/javascript" src="js/XMLWriter.js"></script>	
-	<script>
-		jQuery(document).ready(function () {
-			fox.init();
+    <script type="text/javascript">   
+		jQuery(document).ready(function() {   
+			jQuery().foxRun({
+				FOX_ROOT: jQuery('#foxPanel')
+			});
 		});
-	</script>
+    </script> 
+	<style type="text/css">
+		.exporterPanel {border-top: 2px solid black; margin-top: 10px; cursor: pointer;}
+		#pickOpt {border: 2px outset green; padding: 2px;}
+	</style>
 </head>
 <body>	
 	<script type="text/javascript" src="js/wz_tooltip.js"></script>
@@ -49,8 +55,6 @@
 			
 	<div class="spacer spaceBottom"></div>
 	
-	<div class="exporterPanel" id="exporter">
-
-	</div>
+	<div class="exporterPanel" id="foxPanel"></div>
 </body>
 </html>
