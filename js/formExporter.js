@@ -10,7 +10,6 @@
 		foxComponent : {
 			TOOLBAR 			: { tagType : '<div />', cid : 'options', cssClass : 'options'},
 			OPT_FIND_FORMS 		: { tagType : '<span />', cid : 'findForms', cssClass : 'optLink', txt : 'Find forms', evt : 'click.fox', handler : function(){findFormsInPage();}},
-			OPT_HIDE_PANEL 		: { tagType : '<span />', cid : 'hidePanel', cssClass : 'optLink', txt : 'Hide panel', evt : 'click.fox', handler : function(){hidePanel();}},
 			OPT_REFRESH 		: { tagType : '<span />', cid : 'refresh', cssClass : 'optLink hidden', txt : 'Refresh', evt : 'click.fox', handler : function(){refreshOutput();}},
 			OPT_SHOW_INFO 		: { tagType : '<span />', cid : 'showInfo', cssClass : 'optLink', txt : 'Show info', evt : 'click.fox', handler : function(){showInfo();}},
 			OPT_PICK_FIELDS 	: { tagType : '<span />', cid : 'pickFields', cssClass : 'optLink', txt : 'Pick fields', evt : 'click.fox', handler : function(){pickFields();}},
@@ -30,6 +29,7 @@
 			XML_OUTPUT_WRAPPER_ID 	: 'outField',
 			XML_OUTPUT_FIELD_ID 	: 'xmlOutput',
 			PICK_TABLE_ID 			: '#pickTable',
+			GET_ACTION_SET_ID		: '#getActionSet',
 			NEW_LINE 				: '\n',
 			TAB 					: '\t',
 			D_TAB 					: '\t\t',
@@ -60,31 +60,39 @@
 		config.FOX_ROOT_ID = config.FOX_ROOT.attr('id');
 		foxContainer = config.FOX_ROOT;
 		createInterface();
-		$(document).bind('keyup.fox', stopPlugin);
+		//$(document).bind('keyup.fox', stopPlugin);
 		return this;
 	};
-
+	
+	 // ----------------------------------------------
+	 // 			Private functions.
+	 // ----------------------------------------------
+	 
 	function showInfo() {
+		if(state.isStarted_pickFields) {
+			stopPlugin();
+		}
 		if (!state.isStarted_pickFields) {
-			var container = $('body');
+			//var container = $('body');
+			var container = $('.container');
 			container.bind('mouseover.fox', highlightSource);
-			container.bind('mouseout.fox', unHighlightSource);	
+			container.bind('mouseout.fox', unHighlightSource);
+			$(document).bind('keyup.fox', stopPlugin);
 			state.isStarted_showInfo = true;
 		}
 	}
 	
 	function pickFields() {		
-		//var container = $('body');
-		var container = $('.container');
 		if (!state.isStarted_pickFields) {
+			var container = $('.container');
 			container.bind('mouseover.fox', highlightSource);
 			container.bind('mouseout.fox', unHighlightSource);
+			$(document).bind('keyup.fox', stopPlugin);
+			container.bind('click.fox', pickHandler);
+			createPickTable();
+			$(config.foxConstants.PICK_TABLE_ID).bind('click.fox', removeFromBucket);			
 			state.isStarted_pickFields = true;
 		}
-		$(document).bind('keyup.fox', stopPlugin);
-		container.bind('click.fox', pickHandler);
-		$(config.foxConstants.PICK_TABLE_ID).removeClass(config.foxConstants.CSS_HIDDEN).bind('click.fox', removeFromBucket);
-		$('#getActionSet').removeClass(config.foxConstants.CSS_HIDDEN);	
 	}
 	
 	function pickHandler(evt) {
@@ -95,6 +103,11 @@
 		picked += '</td><td><input type="checkbox"></td></tr>';
 		$('#pickTable > tbody:last').append(picked);
 		pickedList.push(source);
+		if(pickedList.length > 0) {
+			$(config.foxConstants.PICK_TABLE_ID).removeClass(config.foxConstants.CSS_HIDDEN);
+			$(config.foxConstants.GET_ACTION_SET_ID).removeClass(config.foxConstants.CSS_HIDDEN);
+			$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).removeClass(config.foxConstants.CSS_HIDDEN);
+		}		
 		return false;
 	}	
 	
@@ -117,17 +130,19 @@
 		var kc = evt.keyCode;
 		if (kc == 27) {
 			if (state.isStarted_showInfo || state.isStarted_pickFields) {
-				var container = $('body');	
-				container.unbind('mouseover.fox', config.highlightSource);
-				container.unbind('mouseout.fox', config.unHighlightSource);
-				container.unbind('click.fox', config.pickHandler);
-				container.unbind('keyup.fox', config.stopPlugin);
-				var pickTable = $(config.foxConstants.PICK_TABLE_ID);
-				pickTable.unbind('click.fox', removeFromBucket);
-				//pickTable.addClass(config.foxConstants.CSS_HIDDEN);	
-				$('#getActionSet').addClass(config.foxConstants.CSS_HIDDEN);					
-				pickedList = undefined;
-				// TODO must clear pickTable too
+				//var container = $('body');	
+				var container = $('.container');
+				container.unbind('mouseover.fox', highlightSource);
+				container.unbind('mouseout.fox', unHighlightSource);
+				container.unbind('click.fox', pickHandler);
+				$(document).unbind('keyup.fox', stopPlugin);
+				$(config.foxConstants.PICK_TABLE_ID).unbind('click.fox', removeFromBucket);	
+				$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).addClass(config.foxConstants.CSS_HIDDEN);
+				$(config.foxConstants.GET_ACTION_SET_ID).addClass(config.foxConstants.CSS_HIDDEN);					
+				pickedList.length = 0;
+				cleanDOM();
+				state.isStarted_pickFields = false;
+				state.isStarted_showInfo = false;
 				UnTip(config.currentElement);
 				$(config.currentElement).removeClass(config.foxConstants.CSS_HIGHLIGHT);
 			}
@@ -136,7 +151,7 @@
 	
 	function cleanDOM() {
 		$(config.foxConstants.FORMS_TABLE_ID).remove();
-		$(config.foxConstants.XML_OUTPUT_WRAPPER_ID).remove();
+		$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).remove();
 		$(config.foxConstants.PICK_TABLE_ID).remove();
 		state.isVisible_output = false;
 	}
@@ -158,8 +173,23 @@
 		var source = $.getTarget(evt);
 		if (source.tagName.toLowerCase() == 'input') {
 			$(source).parent().parent().remove();
+			pickedList.remove($(source).parent().parent().get(0).rowIndex);
 		}
+		if(pickedList.length == 0) {
+			$(config.foxConstants.PICK_TABLE_ID).addClass(config.foxConstants.CSS_HIDDEN);
+			$(config.foxConstants.GET_ACTION_SET_ID).addClass(config.foxConstants.CSS_HIDDEN);
+			$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).addClass(config.foxConstants.CSS_HIDDEN).text('');
+		}
+		writeXML(pickedList);
 	}	
+	
+	function print(list) {
+		var str;
+		for(var i = 0; i < list.length; i++) {
+			str += list[i].id + '|';
+		}
+		alert('str: ' + str);
+	}
 	
 	function createTooltipContent(el, locators, classes) {
 		var content = '<span style="color:red">tag name:</span>';
@@ -211,29 +241,27 @@
 	
 	function findFormsInPage() {
 		alert('findFormsInPage');
-	}
-	
-	function hidePanel() {
-		alert('hidePanel');
 	}	
 	
 	function createInterface() {
 		// create the options toolbar
 		var toolbar = elementProvider(config.foxComponent.TOOLBAR);
 		$(toolbar).append(elementProvider(config.foxComponent.OPT_FIND_FORMS));
-		$(toolbar).append(elementProvider(config.foxComponent.OPT_HIDE_PANEL));
 		$(toolbar).append(elementProvider(config.foxComponent.OPT_REFRESH));
 		$(toolbar).append(elementProvider(config.foxComponent.OPT_SHOW_INFO));
 		$(toolbar).append(elementProvider(config.foxComponent.OPT_PICK_FIELDS));
 		$(toolbar).append(elementProvider(config.foxComponent.OPT_GET_ACTIONSET));
 		foxContainer.append(toolbar);
+	}
+	
+	function createPickTable() {
 		// create the pick table
 		var pickTable = elementProvider(config.foxComponent.PICK_TABLE);
 		var pickTableHeader = $('<tr/>');
 		$(pickTableHeader).append(elementProvider(config.foxComponent.PICK_TABLE_TH1));
 		$(pickTableHeader).append(elementProvider(config.foxComponent.PICK_TABLE_TH2));
 		$(pickTable).append(pickTableHeader);
-		foxContainer.append(pickTable);
+		foxContainer.append(pickTable);	
 	}
 	
 	function createOutputArea() {
@@ -372,6 +400,13 @@
 	
 	$.getTarget = function(e) {
 		return this.IE ? event.srcElement : e.target;
+	};	
+	
+	// Array Remove - By John Resig (MIT Licensed)
+	Array.prototype.remove = function(from, to) {
+	  var rest = this.slice((to || from) + 1 || this.length);
+	  this.length = from < 0 ? this.length + from : from;
+	  return this.push.apply(this, rest);
 	};	
 	
 })(jQuery);
