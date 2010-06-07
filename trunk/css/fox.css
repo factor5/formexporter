@@ -45,6 +45,20 @@
 	border: 1px solid #000;
 }
 
+.moveUp {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background: #FFFFFF url('../img/up-icon.png') no-repeat;
+}
+
+.moveDown {
+	display: inline-block;
+	width: 16px;
+	height: 16px;
+	background: #FFFFFF url('../img/down-icon.png') no-repeat;
+}
+
 .frmsTbl {
 	border: 1px solid black;
 	border-collapse: collapse;
