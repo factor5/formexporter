@@ -100,7 +100,7 @@
 		var source = $.getTarget(evt);
 		var picked = '<tr><td>';
 		picked += source.tagName + ':';
-		picked += getLocator(source, false);
+		picked += getLocator(source, null, false);
 		picked += '</td>';
 		picked += '<td><input type="checkbox"></td>';
 		picked += '<td><div class="moveUp"></div><div class="moveDown"></div></td></tr>';
@@ -142,8 +142,8 @@
 			locator = currentElement.name;
 		} else {
 			locator = '';
-			if (shouldLog) {
-				missingLocatorsList.push(currentElement.value);
+			if (shouldLog && missingLocatorsList) {
+				missingLocatorsList.push($(currentElement).text());
 			}			
 		}	
 		return locator;
@@ -301,7 +301,7 @@
 		try {
 			// array that will hold the values for the elements that have no
 			// id or name attributes.
-			var missingLocatorsList = [ '\n' ];
+			this.missingLocatorsList = [ '\n' ];
 			var XML = new XMLWriter();
 			// write xml prolog
 			XML.WriteXMLProlog();
@@ -310,9 +310,9 @@
 			XML.BeginNode(config.tag.ACTION_SET);
 			XML.WriteString(config.foxConstants.NEW_LINE);
 			var locator;
-			for ( var i = 0; i < elementsArray.length; i++) {
-				var tagAndValue = getTagValuePair(elementsArray[i]);
-				locator = getLocator(elementsArray[i], true);
+			$.each(elementsArray, function() {
+				var tagAndValue = getTagValuePair(this);
+				locator = getLocator(this, true);
 				// If the element has id or name attribute we create a node
 				// in the xml for it. It will be skipped and logged
 				// otherwise.
@@ -326,8 +326,8 @@
 					XML.EndNode();
 					XML.WriteString(config.foxConstants.NEW_LINE);
 					locator = '';
-				}
-			}
+				}				
+			}); 
 			// close the DATA_SET (the root) tag
 			XML.EndNode();
 			XML.Close();
@@ -370,20 +370,21 @@
 	}
 	
 	function getTagValuePair(tag) {
+		var $currentTag = $(tag);
 		var tagNvalue = {};
-		if (tag.tagName.toLowerCase() == 'input') {
+		if ($currentTag.is('input')) {
 			if (tag.type == 'checkbox' || tag.type == 'radio') {
 				tagNvalue[0] = 'check';
 				tagNvalue[1] = '' + tag.checked;
 				return tagNvalue;
 			} else if (tag.type == 'button' || tag.type == 'submit') {
-				tagNvalue[0] = tagNvalue[0] = 'click';
+				tagNvalue[0] = 'click';
 				tagNvalue[1] = '';
 			} else if (tag.type == 'text' || tag.type == 'password') {
-				tagNvalue[0] = tagNvalue[0] = 'set';
+				tagNvalue[0] = 'set';
 				tagNvalue[1] = tag.value;
 			}
-		} else if (tag.tagName.toLowerCase() == 'select') {
+		} else if ($currentTag.is('select')) {
 			if (tag.multiple == true) {
 				var valueString = '';
 				var opts = tag.options;
@@ -392,22 +393,18 @@
 						valueString += '|' + opts[i].text;
 					}
 				}
-				tagNvalue[0] = tagNvalue[0] = 'select-many';
+				tagNvalue[0] = 'select-many';
 				tagNvalue[1] = valueString == '|' ? '' : valueString.substring(1);
 			} else if (tag.multiple == false) {
-				tagNvalue[0] = tagNvalue[0] = 'set';
+				tagNvalue[0] = 'set';
 				tagNvalue[1] = tag.value;
 			}
-		} else if (tag.tagName.toLowerCase() == 'textarea') {
-			tagNvalue[0] = tagNvalue[0] = 'set';
+		} else if ($currentTag.is('textarea')) {
+			tagNvalue[0] = 'set';
 			tagNvalue[1] = tag.value;
 		} else {
 			tagNvalue[0] = 'get';
-			if (JSCommons.NavigatorType() == 0) { // if IE
-				tagNvalue[1] = tag.innerText;
-			} else { // if not IE
-				tagNvalue[1] = tag.textContent;
-			}
+			tagNvalue[1] = $currentTag.text();
 		}
 		return tagNvalue;
 	}	
