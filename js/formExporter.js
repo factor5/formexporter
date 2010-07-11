@@ -2,8 +2,10 @@
 	var foxContainer;
 	var pickedList = [];
 	var config = {
-		FOX_ROOT : null,
-		FOX_ROOT_ID : ''
+		FOX_ROOT 	: null,
+		FOX_ROOT_ID : '',
+		UP			: -1,
+		DOWN		: 1
 	}
 	
 	var defaults = {
@@ -83,15 +85,31 @@
 		}
 	}
 	
-	function pickFields() {		
+	function pickFields(evt) {		
 		if (!state.isStarted_pickFields) {
+			$('#pickFields').addClass('selectedOptLink');
 			var container = $('.container');
 			container.bind('mouseover.fox', highlightSource);
 			container.bind('mouseout.fox', unHighlightSource);
 			$(document).bind('keyup.fox', stopPlugin);
 			container.bind('click.fox', pickHandler);
 			createPickTable();
-			$(config.foxConstants.PICK_TABLE_ID).bind('click.fox', removeFromBucket);			
+			// bind remove row handler function to pickTable
+			$(config.foxConstants.PICK_TABLE_ID).bind('click.fox', 	function(evt) {
+				var $source = $(evt.target);
+				if ($source.is('input')) {
+					var $currRow = $source.parent().parent();
+					pickedList.remove($currRow.get(0).sectionRowIndex - 1);		
+					$currRow.remove();
+				}
+				if(pickedList.length == 0) {
+					$(config.foxConstants.PICK_TABLE_ID).addClass(config.foxConstants.CSS_HIDDEN);
+					$(config.foxConstants.GET_ACTION_SET_ID).addClass(config.foxConstants.CSS_HIDDEN);
+					//$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).addClass(config.foxConstants.CSS_HIDDEN).text('');
+				} else {
+					writeXML(pickedList);
+				}
+			});			
 			state.isStarted_pickFields = true;
 		}
 	}
@@ -100,7 +118,7 @@
 		var source = $.getTarget(evt);
 		var picked = '<tr><td>';
 		picked += source.tagName + ':';
-		picked += getLocator(source, null, false);
+		picked += getLocator(source, false);
 		picked += '</td>';
 		picked += '<td><input type="checkbox"></td>';
 		picked += '<td><div class="moveUp"></div><div class="moveDown"></div></td></tr>';
@@ -111,17 +129,18 @@
 		if(pickedList.length > 0) {
 			$(config.foxConstants.PICK_TABLE_ID).removeClass(config.foxConstants.CSS_HIDDEN);
 			$(config.foxConstants.GET_ACTION_SET_ID).removeClass(config.foxConstants.CSS_HIDDEN);
-			$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).removeClass(config.foxConstants.CSS_HIDDEN);
-		}		
+			//$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).removeClass(config.foxConstants.CSS_HIDDEN);
+			writeXML(pickedList);
+		}
 		return false;
-	}	
+	}
 	
 	function moveUpHandler(evt) {
 		var $currRow = $(evt.target).parent().parent();
 		var ind = $currRow.get(0).sectionRowIndex - 1;
 		if(ind > 0) {
 			$currRow.prev().before($currRow);
-			pickedList.move(ind, -1);
+			pickedList.move(ind, config.UP);
 		}
 	}
 	
@@ -130,9 +149,9 @@
 		var ind = $currRow.get(0).sectionRowIndex - 1;
 		if(ind < $currRow.parent().children().length - 2) {
 			$currRow.next().after($currRow);
-			pickedList.move(ind, 1);
-		}		
-	}
+			pickedList.move(ind, config.DOWN);
+		}
+	}	
 	
 	function getLocator(currentElement, shouldLog) {
 		var locator;
@@ -159,7 +178,6 @@
 				container.unbind('mouseout.fox', unHighlightSource);
 				container.unbind('click.fox', pickHandler);
 				$(document).unbind('keyup.fox', stopPlugin);
-				$(config.foxConstants.PICK_TABLE_ID).unbind('click.fox', removeFromBucket);	
 				$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).addClass(config.foxConstants.CSS_HIDDEN);
 				$(config.foxConstants.GET_ACTION_SET_ID).addClass(config.foxConstants.CSS_HIDDEN);					
 				pickedList.length = 0;
@@ -168,6 +186,7 @@
 				state.isStarted_showInfo = false;
 				UnTip(config.currentElement);
 				$(config.currentElement).removeClass(config.foxConstants.CSS_HIGHLIGHT);
+				$('#pickFields').removeClass('selectedOptLink');
 			}
 		}
 	}
@@ -191,21 +210,6 @@
 		UnTip(config.currentElement);
 		config.currentElement = null;
 	}
-	
-	function removeFromBucket(evt) {
-		var $source = $(evt.target);
-		if ($source.is('input')) {
-			var $currRow = $source.parent().parent();
-			$currRow.remove();
-			pickedList.remove($currRow.get(0).sectionRowIndex);
-		}
-		if(pickedList.length == 0) {
-			$(config.foxConstants.PICK_TABLE_ID).addClass(config.foxConstants.CSS_HIDDEN);
-			$(config.foxConstants.GET_ACTION_SET_ID).addClass(config.foxConstants.CSS_HIDDEN);
-			$('#'+config.foxConstants.XML_OUTPUT_WRAPPER_ID).addClass(config.foxConstants.CSS_HIDDEN).text('');
-		}
-		writeXML(pickedList);
-	}	
 	
 	function print(list) {
 		var str;
