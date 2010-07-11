@@ -36,13 +36,20 @@
 }
 
 #pickTable tr th {
-	width: 300px;
 	background-color: beige;
 	font-weight: bold;
 }
 
 #pickTable tr td, #pickTable tr th {
 	border: 1px solid #000;
+}
+
+.removeOptColumn {
+	width: 15%;
+}
+
+.orderOptColumn {
+	width: 10%;
 }
 
 .moveUp {
@@ -94,5 +101,5 @@ div div.outputShow {
 }
 
 .highlight {
-	border: 1px solid red !important;
+	outline: 1px solid red !important;
 }
